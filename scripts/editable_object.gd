@@ -68,8 +68,8 @@ func set_selected(selected: bool):
 			var main = get_parent()
 			match building_type:
 				main.BuildingType.LARGE_BUILDING:
-					mesh_instance.material_override = main.building_material
+					mesh_instance.material_override = main.building_material.duplicate()
 				main.BuildingType.ROAD:
-					mesh_instance.material_override = main.road_material
+					mesh_instance.material_override = main.road_material.duplicate()
 				main.BuildingType.LAKE:
-					mesh_instance.material_override = main.lake_material
+					mesh_instance.material_override = main.lake_material.duplicate()
