@@ -5,6 +5,7 @@ var is_selected = false
 var original_scale = Vector3.ONE
 var original_rotation = Vector3.ZERO
 var building_type
+var original_material: Material  # Store the original material
 
 # Edit handles
 var scale_handle_visible = false
@@ -15,6 +16,11 @@ func _ready():
 		building_type = get_meta("building_type")
 	original_scale = scale
 	original_rotation = rotation_degrees
+
+	# Store the original material
+	var mesh_instance = get_node_or_null("MeshInstance3D")
+	if mesh_instance and mesh_instance.material_override:
+		original_material = mesh_instance.material_override
 
 func _input(event):
 	if not is_selected:
@@ -52,6 +58,10 @@ func set_selected(selected: bool):
 	var mesh_instance = get_node_or_null("MeshInstance3D")
 	if mesh_instance:
 		if selected:
+			# Store the current material if we haven't already
+			if not original_material and mesh_instance.material_override:
+				original_material = mesh_instance.material_override
+
 			# Use the same bright ghost-like material as preview
 			var ghost_material = StandardMaterial3D.new()
 			ghost_material.albedo_color = Color(1.0, 1.0, 1.0, 0.5)  # Bright white, semi-transparent
@@ -59,11 +69,5 @@ func set_selected(selected: bool):
 			mesh_instance.material_override = ghost_material
 		else:
 			# Reset to original material
-			var main = get_parent()
-			match building_type:
-				main.BuildingType.LARGE_BUILDING:
-					mesh_instance.material_override = main.building_material.duplicate()
-				main.BuildingType.ROAD:
-					mesh_instance.material_override = main.road_material.duplicate()
-				main.BuildingType.LAKE:
-					mesh_instance.material_override = main.lake_material.duplicate()
+			if original_material:
+				mesh_instance.material_override = original_material
