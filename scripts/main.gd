@@ -241,7 +241,7 @@ func create_building_mesh(type: BuildingType, is_preview: bool) -> Node3D:
 			if is_preview:
 				mesh_instance.material_override = preview_material
 			else:
-				mesh_instance.material_override = building_material
+				mesh_instance.material_override = building_material.duplicate()
 
 		BuildingType.ROAD:
 			var box = BoxMesh.new()
@@ -255,7 +255,7 @@ func create_building_mesh(type: BuildingType, is_preview: bool) -> Node3D:
 			if is_preview:
 				mesh_instance.material_override = preview_material
 			else:
-				mesh_instance.material_override = road_material
+				mesh_instance.material_override = road_material.duplicate()
 
 		BuildingType.LAKE:
 			var box = BoxMesh.new()
@@ -269,7 +269,7 @@ func create_building_mesh(type: BuildingType, is_preview: bool) -> Node3D:
 			if is_preview:
 				mesh_instance.material_override = preview_material
 			else:
-				mesh_instance.material_override = lake_material
+				mesh_instance.material_override = lake_material.duplicate()
 
 	container.add_child(mesh_instance)
 
