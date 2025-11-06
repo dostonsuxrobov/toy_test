@@ -62,11 +62,12 @@ func set_selected(selected: bool):
 			if not original_material and mesh_instance.material_override:
 				original_material = mesh_instance.material_override
 
-			# Use the same bright ghost-like material as preview
-			var ghost_material = StandardMaterial3D.new()
-			ghost_material.albedo_color = Color(1.0, 1.0, 1.0, 0.5)  # Bright white, semi-transparent
-			ghost_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-			mesh_instance.material_override = ghost_material
+			# Use a complete red material for strong visual feedback
+			var selection_material = StandardMaterial3D.new()
+			selection_material.albedo_color = Color(1.0, 0.0, 0.0, 1.0)  # Complete red, fully opaque
+			selection_material.metallic = 0.0
+			selection_material.roughness = 0.8
+			mesh_instance.material_override = selection_material
 		else:
 			# Reset to original material
 			if original_material:
