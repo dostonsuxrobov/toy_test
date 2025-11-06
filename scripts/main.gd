@@ -27,12 +27,14 @@ var placed_objects = []
 var selected_object: Node3D = null
 var is_editing = false
 
+# Store original materials for each object
+var object_materials = {}
+
 # Materials
 var building_material: StandardMaterial3D
 var road_material: StandardMaterial3D
 var lake_material: StandardMaterial3D
 var preview_material: StandardMaterial3D
-var selected_material: StandardMaterial3D
 
 func _ready():
 	setup_materials()
@@ -63,12 +65,33 @@ func setup_materials():
 	preview_material.albedo_color = Color(1.0, 1.0, 1.0, 0.5)
 	preview_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 
-	# Selected material (yellow highlight)
-	selected_material = StandardMaterial3D.new()
-	selected_material.albedo_color = Color(1.0, 1.0, 0.0, 0.3)
-	selected_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-
 func _input(event):
+	# Handle selected object input
+	if selected_object and is_editing:
+		if event is InputEventKey and event.pressed:
+			# Delete with Delete/Backspace key
+			if event.keycode == KEY_DELETE or event.keycode == KEY_BACKSPACE:
+				delete_selected_object()
+				return
+			# Scale with + and - keys
+			elif event.keycode == KEY_EQUAL or event.keycode == KEY_PLUS:
+				selected_object.scale *= 1.1
+				print("Scaled up")
+				return
+			elif event.keycode == KEY_MINUS:
+				selected_object.scale *= 0.9
+				print("Scaled down")
+				return
+			# Rotate with Q and E keys
+			elif event.keycode == KEY_Q:
+				selected_object.rotation_degrees.y += 15
+				print("Rotated left")
+				return
+			elif event.keycode == KEY_E:
+				selected_object.rotation_degrees.y -= 15
+				print("Rotated right")
+				return
+
 	# Camera rotation with middle mouse button
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_MIDDLE:
@@ -90,21 +113,17 @@ func _input(event):
 		# Right click to deselect
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			if current_building_type != BuildingType.NONE:
-				# Deselect building type (cancel placement mode)
 				set_building_type(BuildingType.NONE)
 				print("Placement mode cancelled")
 			elif selected_object:
-				# Deselect selected object
 				deselect_object()
 
 	# ESC key to deselect
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if current_building_type != BuildingType.NONE:
-			# Cancel placement mode
 			set_building_type(BuildingType.NONE)
 			print("Placement mode cancelled")
 		elif selected_object:
-			# Deselect selected object
 			deselect_object()
 
 	# Mouse motion for camera control
@@ -140,8 +159,7 @@ func update_camera_position():
 
 func set_building_type(type: BuildingType):
 	current_building_type = type
-	selected_object = null
-	is_editing = false
+	deselect_object()
 
 	# Clear any existing preview
 	if preview_object:
@@ -190,26 +208,63 @@ func select_object_at_mouse():
 	query.collision_mask = 2  # Objects layer
 	var result = space_state.intersect_ray(query)
 
-	# Deselect previous object
-	if selected_object and selected_object.has_method("set_selected"):
-		selected_object.set_selected(false)
-		selected_object = null
+	# Deselect previous object first
+	if selected_object:
+		restore_original_material(selected_object)
 
 	if result and result.collider:
 		var obj = result.collider.get_parent()
 		if obj in placed_objects:
 			selected_object = obj
 			is_editing = true
-			if selected_object.has_method("set_selected"):
-				selected_object.set_selected(true)
+			apply_highlight_material(selected_object)
 			print("Selected object for editing. Use +/- to scale, Q/E to rotate, Delete to remove")
+		else:
+			selected_object = null
+			is_editing = false
+	else:
+		selected_object = null
+		is_editing = false
 
 func deselect_object():
-	if selected_object and selected_object.has_method("set_selected"):
-		selected_object.set_selected(false)
+	if selected_object:
+		restore_original_material(selected_object)
 	selected_object = null
 	is_editing = false
 	print("Object deselected")
+
+func delete_selected_object():
+	if selected_object:
+		placed_objects.erase(selected_object)
+		object_materials.erase(selected_object)
+		selected_object.queue_free()
+		selected_object = null
+		is_editing = false
+		print("Object deleted")
+
+func apply_highlight_material(obj: Node3D):
+	var mesh_instance = obj.get_node_or_null("MeshInstance3D")
+	
+	if mesh_instance and mesh_instance.material_override:
+		# Store original material if not already stored
+		if not obj in object_materials:
+			object_materials[obj] = mesh_instance.material_override.duplicate()
+		
+		# Create bright highlight material
+		var highlight_material = StandardMaterial3D.new()
+		highlight_material.albedo_color = Color(1.0, 1.0, 0.3, 1.0)  # Bright yellow
+		highlight_material.emission_enabled = true
+		highlight_material.emission = Color(0.8, 0.8, 0.0)
+		highlight_material.emission_energy_multiplier = 0.5
+		highlight_material.metallic = 0.0
+		highlight_material.roughness = 0.5
+		
+		mesh_instance.material_override = highlight_material
+
+func restore_original_material(obj: Node3D):
+	var mesh_instance = obj.get_node_or_null("MeshInstance3D")
+	if mesh_instance and obj in object_materials:
+		mesh_instance.material_override = object_materials[obj].duplicate()
 
 func place_building():
 	if not preview_object:
@@ -227,6 +282,9 @@ func create_building_mesh(type: BuildingType, is_preview: bool) -> Node3D:
 	var mesh_instance = MeshInstance3D.new()
 	var collision_shape = CollisionShape3D.new()
 	var static_body = StaticBody3D.new()
+
+	# IMPORTANT: Give the mesh instance a name so we can find it later
+	mesh_instance.name = "MeshInstance3D"
 
 	match type:
 		BuildingType.LARGE_BUILDING:
@@ -282,11 +340,6 @@ func create_building_mesh(type: BuildingType, is_preview: bool) -> Node3D:
 		# Store metadata
 		container.set_meta("building_type", type)
 		container.set_meta("editable", true)
-
-		# Add editing script
-		var script_path = "res://scripts/editable_object.gd"
-		var edit_script = load(script_path)
-		container.set_script(edit_script)
 
 	return container
 

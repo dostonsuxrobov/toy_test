@@ -5,22 +5,24 @@ var is_selected = false
 var original_scale = Vector3.ONE
 var original_rotation = Vector3.ZERO
 var building_type
-var original_material: Material  # Store the original material
-
-# Edit handles
-var scale_handle_visible = false
-var rotate_handle_visible = false
+var original_material: Material = null
+var material_stored = false
 
 func _ready():
+	print("=== EDITABLE OBJECT READY ===")
+	print("Node name: ", name)
+	
 	if has_meta("building_type"):
 		building_type = get_meta("building_type")
+		print("Building type: ", building_type)
+	
 	original_scale = scale
 	original_rotation = rotation_degrees
-
-	# Store the original material
+	
 	var mesh_instance = get_node_or_null("MeshInstance3D")
-	if mesh_instance and mesh_instance.material_override:
-		original_material = mesh_instance.material_override
+	print("MeshInstance3D found: ", mesh_instance != null)
+	if mesh_instance:
+		print("Current material: ", mesh_instance.material_override)
 
 func _input(event):
 	if not is_selected:
@@ -52,23 +54,43 @@ func _input(event):
 			print("Rotated right")
 
 func set_selected(selected: bool):
+	print("\n=== SET_SELECTED CALLED ===")
+	print("Selected: ", selected)
+	
 	is_selected = selected
-
-	# Visual feedback for selection
+	
 	var mesh_instance = get_node_or_null("MeshInstance3D")
-	if mesh_instance:
-		if selected:
-			# Store the current material if we haven't already
-			if not original_material and mesh_instance.material_override:
-				original_material = mesh_instance.material_override
-
-			# Use a complete red material for strong visual feedback
-			var selection_material = StandardMaterial3D.new()
-			selection_material.albedo_color = Color(1.0, 0.0, 0.0, 1.0)  # Complete red, fully opaque
-			selection_material.metallic = 0.0
-			selection_material.roughness = 0.8
-			mesh_instance.material_override = selection_material
+	print("MeshInstance3D: ", mesh_instance)
+	
+	if not mesh_instance:
+		print("ERROR: No MeshInstance3D found!")
+		return
+	
+	if selected:
+		print("Applying selection highlight...")
+		
+		# Store the original material the first time we select
+		if not material_stored and mesh_instance.material_override:
+			original_material = mesh_instance.material_override.duplicate()
+			material_stored = true
+			print("Stored original material: ", original_material)
+		
+		# Create highlight material (bright yellow with slight transparency)
+		var highlight_material = StandardMaterial3D.new()
+		highlight_material.albedo_color = Color(1.0, 1.0, 0.3, 1.0)  # Bright yellow
+		highlight_material.emission_enabled = true
+		highlight_material.emission = Color(0.8, 0.8, 0.0)  # Yellow glow
+		highlight_material.emission_energy_multiplier = 0.5
+		highlight_material.metallic = 0.0
+		highlight_material.roughness = 0.5
+		
+		mesh_instance.material_override = highlight_material
+		print("Applied highlight material: ", mesh_instance.material_override)
+	else:
+		print("Restoring original material...")
+		# Restore the original material
+		if original_material:
+			mesh_instance.material_override = original_material.duplicate()
+			print("Restored original material: ", mesh_instance.material_override)
 		else:
-			# Reset to original material
-			if original_material:
-				mesh_instance.material_override = original_material
+			print("WARNING: No original material to restore!")
