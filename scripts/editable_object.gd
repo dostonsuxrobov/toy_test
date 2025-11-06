@@ -52,10 +52,16 @@ func set_selected(selected: bool):
 	var mesh_instance = get_node_or_null("MeshInstance3D")
 	if mesh_instance:
 		if selected:
-			# Add yellow tint to show selection
+			# Make it brighter to show selection
 			if mesh_instance.material_override:
 				var material = mesh_instance.material_override.duplicate()
-				material.albedo_color = material.albedo_color * Color(1.2, 1.2, 0.8)
+				# Make the color brighter by multiplying by 1.4
+				material.albedo_color = Color(
+					material.albedo_color.r * 1.4,
+					material.albedo_color.g * 1.4,
+					material.albedo_color.b * 1.4,
+					material.albedo_color.a
+				)
 				mesh_instance.material_override = material
 		else:
 			# Reset to original material
