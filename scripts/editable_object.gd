@@ -52,25 +52,11 @@ func set_selected(selected: bool):
 	var mesh_instance = get_node_or_null("MeshInstance3D")
 	if mesh_instance:
 		if selected:
-			# Make it brighter AND add emission (glow) to show selection clearly
-			if mesh_instance.material_override:
-				var material = mesh_instance.material_override.duplicate()
-
-				# Brighten the base color significantly
-				material.albedo_color = Color(
-					min(material.albedo_color.r * 5.0, 1.0),
-					min(material.albedo_color.g * 5.0, 1.0),
-					min(material.albedo_color.b * 5.0, 1.0),
-					material.albedo_color.a
-				)
-
-				# Add strong emission (glow) for clear visibility
-				material.emission_enabled = true
-				# Use bright yellow-orange emission for maximum visibility
-				material.emission = Color(1.0, 0.9, 0.3)
-				material.emission_energy_multiplier = 2.0
-
-				mesh_instance.material_override = material
+			# Use the same bright ghost-like material as preview
+			var ghost_material = StandardMaterial3D.new()
+			ghost_material.albedo_color = Color(1.0, 1.0, 1.0, 0.5)  # Bright white, semi-transparent
+			ghost_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			mesh_instance.material_override = ghost_material
 		else:
 			# Reset to original material
 			var main = get_parent()
