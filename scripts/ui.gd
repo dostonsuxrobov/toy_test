@@ -3,7 +3,6 @@ extends CanvasLayer
 @onready var building_btn = $Panel/HBoxContainer/BuildingButton
 @onready var road_btn = $Panel/HBoxContainer/RoadButton
 @onready var lake_btn = $Panel/HBoxContainer/LakeButton
-@onready var clear_btn = $Panel/HBoxContainer/ClearButton
 @onready var info_label = $InfoLabel
 
 var main_scene: Node3D
@@ -16,7 +15,6 @@ func _ready():
 	building_btn.pressed.connect(_on_building_pressed)
 	road_btn.pressed.connect(_on_road_pressed)
 	lake_btn.pressed.connect(_on_lake_pressed)
-	clear_btn.pressed.connect(_on_clear_pressed)
 
 	update_info()
 
@@ -35,16 +33,11 @@ func _on_lake_pressed():
 	main_scene._on_lake_button_pressed()
 	update_button_states(lake_btn)
 
-func _on_clear_pressed():
-	main_scene._on_clear_button_pressed()
-	update_button_states(clear_btn)
-
 func update_button_states(active_button):
 	# Reset all button colors
 	building_btn.modulate = Color.WHITE
 	road_btn.modulate = Color.WHITE
 	lake_btn.modulate = Color.WHITE
-	clear_btn.modulate = Color.WHITE
 
 	# Highlight active button
 	if active_button:
