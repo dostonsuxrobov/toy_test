@@ -87,6 +87,25 @@ func _input(event):
 		# Left click for placing/selecting
 		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			handle_left_click()
+		# Right click to deselect
+		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
+			if current_building_type != BuildingType.NONE:
+				# Deselect building type (cancel placement mode)
+				set_building_type(BuildingType.NONE)
+				print("Placement mode cancelled")
+			elif selected_object:
+				# Deselect selected object
+				deselect_object()
+
+	# ESC key to deselect
+	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+		if current_building_type != BuildingType.NONE:
+			# Cancel placement mode
+			set_building_type(BuildingType.NONE)
+			print("Placement mode cancelled")
+		elif selected_object:
+			# Deselect selected object
+			deselect_object()
 
 	# Mouse motion for camera control
 	if event is InputEventMouseMotion:
@@ -184,6 +203,13 @@ func select_object_at_mouse():
 			if selected_object.has_method("set_selected"):
 				selected_object.set_selected(true)
 			print("Selected object for editing. Use +/- to scale, Q/E to rotate, Delete to remove")
+
+func deselect_object():
+	if selected_object and selected_object.has_method("set_selected"):
+		selected_object.set_selected(false)
+	selected_object = null
+	is_editing = false
+	print("Object deselected")
 
 func place_building():
 	if not preview_object:
