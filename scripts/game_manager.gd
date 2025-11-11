@@ -18,12 +18,15 @@ var is_playing: bool = false
 var tick_timer: float = 0.0
 var cycle_count: int = 0
 
-var camera: Camera2D
+var camera: CameraController
 var ui_layer: CanvasLayer
 
 # Placement mode
 var placement_mode: String = ""  # "arm", "input", "output"
 var selected_atom_type: Atom.AtomType = Atom.AtomType.SALT
+
+# Mouse hover
+var hovered_hex: Vector2i = Vector2i(0, 0)
 
 signal cycle_completed
 signal level_completed
@@ -33,6 +36,12 @@ func _ready():
 	setup_level()
 
 func _process(delta):
+	if not is_playing:
+		# Update hovered hex for visual feedback
+		var mouse_pos = get_global_mouse_position()
+		hovered_hex = HexGrid.pixel_to_axial(mouse_pos, HEX_SIZE)
+		queue_redraw()
+
 	if is_playing:
 		tick_timer += delta
 		if tick_timer >= TICK_SPEED:
@@ -45,6 +54,11 @@ func _draw():
 		for r in range(-grid_height, grid_height):
 			var pos = HexGrid.axial_to_pixel(q, r, HEX_SIZE)
 			draw_hexagon(pos, HEX_SIZE, Color(0.2, 0.2, 0.25, 0.3))
+
+	# Draw hovered hex
+	if placement_mode == "arm":
+		var hover_pos = HexGrid.axial_to_pixel(hovered_hex.x, hovered_hex.y, HEX_SIZE)
+		draw_hexagon(hover_pos, HEX_SIZE, Color(0.8, 0.8, 0.2, 0.6))
 
 	# Draw input zones
 	for zone in input_zones:
@@ -64,8 +78,7 @@ func draw_hexagon(center: Vector2, size: float, color: Color):
 	draw_polyline(points, color, 1.5)
 
 func setup_camera():
-	camera = Camera2D.new()
-	camera.position = Vector2(640, 360)
+	camera = CameraController.new()
 	add_child(camera)
 
 func setup_level():
@@ -182,10 +195,11 @@ func add_arm_at_position(q: int, r: int):
 	arms.append(arm)
 	add_child(arm)
 
-func _input(event):
+func _unhandled_input(event):
+	# Use _unhandled_input so camera can handle its inputs first
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		var mouse_pos = get_global_mouse_position()
-		var hex_pos = HexGrid.pixel_to_axial(mouse_pos, HEX_SIZE)
-
 		if placement_mode == "arm":
+			var mouse_pos = get_global_mouse_position()
+			var hex_pos = HexGrid.pixel_to_axial(mouse_pos, HEX_SIZE)
 			add_arm_at_position(hex_pos.x, hex_pos.y)
+			get_viewport().set_input_as_handled()
