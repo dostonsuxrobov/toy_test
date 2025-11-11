@@ -207,9 +207,17 @@ func add_arm_at_position(q: int, r: int):
 	add_child(arm)
 	print("Arm placed! Total arms: ", arms.size())
 
-func _unhandled_input(event):
-	# Use _unhandled_input so camera can handle its inputs first
+func _input(event):
+	# Handle left clicks for arm placement
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		# Check if mouse is over UI - if so, don't place arms
+		var viewport_pos = get_viewport().get_mouse_position()
+		var ui_rect = Rect2(10, 10, 270, 500)  # Approximate UI panel bounds
+
+		if ui_rect.has_point(viewport_pos):
+			print("Click on UI - ignoring")
+			return
+
 		print("Left click detected! Placement mode: ", placement_mode)
 		if placement_mode == "arm":
 			var mouse_pos = get_viewport_mouse_world_position()

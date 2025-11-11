@@ -20,10 +20,12 @@ func setup_ui():
 	var panel = PanelContainer.new()
 	panel.position = Vector2(10, 10)
 	panel.custom_minimum_size = Vector2(250, 0)
+	panel.mouse_filter = Control.MOUSE_FILTER_STOP  # Only consume input within panel bounds
 	add_child(panel)
 
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 5)
+	vbox.mouse_filter = Control.MOUSE_FILTER_PASS  # Let clicks pass through container
 	panel.add_child(vbox)
 
 	# Title
