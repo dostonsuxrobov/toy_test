@@ -38,7 +38,7 @@ func _ready():
 func _process(delta):
 	if not is_playing:
 		# Update hovered hex for visual feedback
-		var mouse_pos = get_global_mouse_position()
+		var mouse_pos = get_viewport_mouse_world_position()
 		hovered_hex = HexGrid.pixel_to_axial(mouse_pos, HEX_SIZE)
 		queue_redraw()
 
@@ -47,6 +47,17 @@ func _process(delta):
 		if tick_timer >= TICK_SPEED:
 			tick_timer = 0.0
 			execute_simulation_step()
+
+func get_viewport_mouse_world_position() -> Vector2:
+	# Convert viewport mouse position to world position accounting for camera
+	if camera:
+		var viewport_pos = get_viewport().get_mouse_position()
+		var viewport_size = get_viewport().get_visible_rect().size
+		var viewport_center = viewport_size / 2.0
+		# Calculate world position: camera position + (mouse offset from center) / zoom
+		var world_pos = camera.position + (viewport_pos - viewport_center) / camera.zoom
+		return world_pos
+	return get_global_mouse_position()
 
 func _draw():
 	# Draw hex grid
@@ -194,12 +205,15 @@ func add_arm_at_position(q: int, r: int):
 	arm.add_instruction(MechanicalArm.Instruction.ROTATE_CW)
 	arms.append(arm)
 	add_child(arm)
+	print("Arm placed! Total arms: ", arms.size())
 
 func _unhandled_input(event):
 	# Use _unhandled_input so camera can handle its inputs first
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		print("Left click detected! Placement mode: ", placement_mode)
 		if placement_mode == "arm":
-			var mouse_pos = get_global_mouse_position()
+			var mouse_pos = get_viewport_mouse_world_position()
 			var hex_pos = HexGrid.pixel_to_axial(mouse_pos, HEX_SIZE)
+			print("Placing arm at hex: ", hex_pos, " (world pos: ", mouse_pos, ")")
 			add_arm_at_position(hex_pos.x, hex_pos.y)
 			get_viewport().set_input_as_handled()

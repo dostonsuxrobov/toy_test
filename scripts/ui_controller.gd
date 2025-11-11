@@ -118,9 +118,13 @@ func _on_reset_pressed():
 		info_label.text = "Simulation reset"
 
 func _on_place_arm_toggled(toggled: bool):
+	print("Place arm button toggled: ", toggled)
 	if game_manager:
 		game_manager.placement_mode = "arm" if toggled else ""
+		print("Set placement_mode to: ", game_manager.placement_mode)
 		info_label.text = "Click hex to place arm" if toggled else "Arm placement disabled"
+	else:
+		print("ERROR: game_manager is null!")
 
 func _on_cycle_completed():
 	if game_manager:
