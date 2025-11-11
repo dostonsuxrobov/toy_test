@@ -90,7 +90,7 @@ func setup_ui():
 	vbox.add_child(separator4)
 
 	var instructions = Label.new()
-	instructions.text = "Objective: Move all atoms\nfrom green zone to red zone\n\nArm Program:\n- Grab atom\n- Rotate 180°\n- Drop atom\n- Rotate back\n- Repeat"
+	instructions.text = "Objective: Move all atoms\nfrom green zone to red zone\n\nCamera Controls:\n- Right/Middle Mouse: Pan\n- Mouse Wheel: Zoom\n\nArm Program:\n- Grab atom\n- Rotate 180°\n- Drop atom\n- Rotate back\n- Repeat"
 	instructions.autowrap_mode = TextServer.AUTOWRAP_WORD
 	instructions.custom_minimum_size = Vector2(230, 0)
 	vbox.add_child(instructions)

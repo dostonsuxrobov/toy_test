@@ -11,8 +11,12 @@ This is an unpolished but mechanically functional clone of Opus Magnum's core me
 ### Objective
 Move all atoms from the green input zone to the red output zone.
 
-### Controls
-1. **Place Arm** - Click the "Place Arm (Click)" button, then click on any hex tile to place a mechanical arm
+### Camera Controls
+- **Right Mouse or Middle Mouse** - Drag to pan the camera
+- **Mouse Wheel** - Zoom in/out
+
+### Game Controls
+1. **Place Arm** - Click the "Place Arm (Click)" button, then left-click on any hex tile to place a mechanical arm
 2. **Play** - Start the simulation
 3. **Pause** - Pause the simulation
 4. **Reset** - Reset the level to initial state

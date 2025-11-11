@@ -25,20 +25,36 @@ enum Instruction {
 
 func _ready():
 	z_index = 5
+	queue_redraw()
 
 func _draw():
-	# Draw base
-	draw_circle(Vector2.ZERO, 12, Color(0.4, 0.4, 0.4))
-	draw_arc(Vector2.ZERO, 12, 0, TAU, 32, Color(0.7, 0.7, 0.7), 2.0)
+	var arm_end = get_arm_end_local()
+
+	# Draw arm shadow
+	draw_line(Vector2(2, 2), arm_end + Vector2(2, 2), Color(0, 0, 0, 0.3), 8.0)
 
 	# Draw arm
-	var arm_end = get_arm_end_local()
 	draw_line(Vector2.ZERO, arm_end, Color(0.5, 0.5, 0.5), 6.0)
-	draw_circle(arm_end, 8, Color(0.3, 0.3, 0.3))
+	draw_line(Vector2.ZERO, arm_end, Color(0.7, 0.7, 0.7), 4.0)
+
+	# Draw base
+	draw_circle(Vector2.ZERO, 14, Color(0.3, 0.3, 0.3))
+	draw_circle(Vector2.ZERO, 12, Color(0.5, 0.5, 0.5))
+	draw_arc(Vector2.ZERO, 12, 0, TAU, 32, Color(0.8, 0.8, 0.8), 2.5)
+
+	# Draw direction indicator
+	var dir_end = Vector2(cos(rotation_angle * PI / 3.0), sin(rotation_angle * PI / 3.0)) * 8
+	draw_line(Vector2.ZERO, dir_end, Color(1, 1, 0.2), 2.0)
 
 	# Draw gripper
+	draw_circle(arm_end, 10, Color(0.2, 0.2, 0.2))
+	draw_circle(arm_end, 8, Color(0.4, 0.4, 0.4))
+
+	# Draw gripper state
 	if held_atom:
-		draw_circle(arm_end, 10, Color(0.8, 0.8, 0.2), false, 2.0)
+		draw_arc(arm_end, 12, 0, TAU, 32, Color(0.2, 1.0, 0.2), 3.0)
+	else:
+		draw_arc(arm_end, 10, 0, TAU, 32, Color(0.8, 0.8, 0.8), 2.0)
 
 func set_grid_position(q: int, r: int, size: float):
 	grid_pos = Vector2i(q, r)

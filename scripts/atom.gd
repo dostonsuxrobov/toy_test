@@ -23,11 +23,22 @@ const COLORS = {
 
 func _ready():
 	z_index = 10
+	queue_redraw()
 
 func _draw():
 	var color = COLORS.get(atom_type, Color.WHITE)
+
+	# Glow effect
+	draw_circle(Vector2.ZERO, 18, Color(color.r, color.g, color.b, 0.3))
+
+	# Main circle
 	draw_circle(Vector2.ZERO, 15, color)
-	draw_arc(Vector2.ZERO, 15, 0, TAU, 32, Color.WHITE, 2.0)
+
+	# Outline
+	draw_arc(Vector2.ZERO, 15, 0, TAU, 32, Color.WHITE, 2.5)
+
+	# Small highlight
+	draw_circle(Vector2(-5, -5), 4, Color(1, 1, 1, 0.6))
 
 func set_grid_position(q: int, r: int, hex_size: float):
 	grid_pos = Vector2i(q, r)
