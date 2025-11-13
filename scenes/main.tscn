@@ -1,0 +1,149 @@
+[gd_scene load_steps=10 format=3 uid="uid://bxqj7ymjm4k5p"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/camera_controller.gd" id="2_camera"]
+[ext_resource type="Script" path="res://scripts/building_manager.gd" id="3_building"]
+[ext_resource type="Script" path="res://scripts/game_manager.gd" id="4_game"]
+[ext_resource type="Script" path="res://scripts/ui_manager.gd" id="5_ui"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_terrain"]
+size = Vector2(50, 50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.3, 0.6, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_environment"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_world"]
+background_mode = 2
+sky = SubResource("Sky_environment")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.5
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="Terrain" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_terrain")
+surface_material_override/0 = SubResource("StandardMaterial3D_grass")
+
+[node name="CameraController" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.825336, 0.564642, 0, -0.564642, 0.825336, 0, 8, 15)
+script = ExtResource("2_camera")
+
+[node name="Camera3D" type="Camera3D" parent="CameraController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 20)
+
+[node name="BuildingManager" type="Node3D" parent="."]
+script = ExtResource("3_building")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75, 0.433013, 0, 10, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_world")
+
+[node name="GameManager" type="Node" parent="."]
+script = ExtResource("4_game")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_ui")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 200.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Tiny Glade Clone"
+horizontal_alignment = 1
+
+[node name="ModeLabel" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Current Mode: Wall"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="WallButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Wall (1)"
+
+[node name="TowerButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Tower (2)"
+
+[node name="GateButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Gate (3)"
+
+[node name="DeleteButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+text = "Delete (X)"
+
+[node name="ControlsContainer" type="HBoxContainer" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="ClearButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ControlsContainer"]
+layout_mode = 2
+text = "Clear Chain (ESC)"
+
+[node name="SaveButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ControlsContainer"]
+layout_mode = 2
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="UI/MarginContainer/VBoxContainer/ControlsContainer"]
+layout_mode = 2
+text = "Load"
+
+[node name="HelpLabel" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Click to place wall points. Click again to continue the wall chain.
+Right-click and drag to rotate camera. Scroll to zoom."
+horizontal_alignment = 1
+
+[node name="BottomInfo" type="Label" parent="UI"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Controls: Right-Click = Rotate | Scroll = Zoom | Middle-Click = Pan"
+horizontal_alignment = 1
