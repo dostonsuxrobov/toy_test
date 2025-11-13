@@ -1,0 +1,5 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" fill="#3d8fcc"/>
+  <polygon points="64,20 100,50 100,90 64,110 28,90 28,50" fill="#ffffff" stroke="#2c6ba0" stroke-width="4"/>
+  <text x="64" y="75" font-family="Arial" font-size="20" fill="#3d8fcc" text-anchor="middle">Dorf</text>
+</svg>
