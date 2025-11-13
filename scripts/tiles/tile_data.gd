@@ -12,7 +12,7 @@ var quest_type: TerrainType.Type = TerrainType.Type.NONE
 var quest_target: int = 0
 var is_perfect: bool = false  # Set to true if all 6 sides match neighbors when placed
 
-func _init(side_terrains: Array = [], center: TerrainType.Type = TerrainType.Type.NONE) -> void:
+func _init(side_terrains: Array, center: TerrainType.Type) -> void:
 	center_terrain = center
 
 	# Initialize with 6 sides
