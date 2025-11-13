@@ -60,7 +60,7 @@ func update_mode_label(mode: int):
 	match mode:
 		0:  # WALL
 			mode_text = "Wall Mode"
-			help_label.text = "Click to place wall points. Click again to continue the wall chain."
+			help_label.text = "Click to place wall points. Hold CTRL to disable snapping. Hold SHIFT for 45°/90° angles."
 		1:  # TOWER
 			mode_text = "Tower Mode"
 			help_label.text = "Click to place towers."
