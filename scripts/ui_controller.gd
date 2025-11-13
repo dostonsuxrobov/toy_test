@@ -55,7 +55,9 @@ func _on_part_button_pressed(part_type: String) -> void:
 
 func _on_test_button_pressed() -> void:
 	if game_manager:
-		if game_manager.current_state == GameManager.GameState.BUILD:
+		if game_manager.current_state == GameManager.GameState.BRIEFING:
+			game_manager.start_building()
+		elif game_manager.current_state == GameManager.GameState.BUILD:
 			game_manager.change_state(GameManager.GameState.TEST)
 		elif game_manager.current_state == GameManager.GameState.TEST:
 			game_manager.change_state(GameManager.GameState.BUILD)
@@ -71,14 +73,110 @@ func _on_continue_button_pressed() -> void:
 
 func _on_state_changed(new_state: GameManager.GameState) -> void:
 	match new_state:
+		GameManager.GameState.BRIEFING:
+			# Show "Start Building" button, hide everything else
+			test_button.text = "Start Building"
+			test_button.visible = true
+			reset_button.visible = false
+			part_menu.visible = false
+			stats_panel.visible = false
+			hide_time_controls()
 		GameManager.GameState.BUILD:
 			test_button.text = "Test Machine"
+			test_button.visible = true
+			reset_button.visible = true
 			part_menu.visible = true
+			stats_panel.visible = true
+			hide_time_controls()
 		GameManager.GameState.TEST:
 			test_button.text = "Stop Test"
 			part_menu.visible = false
+			stats_panel.visible = false
+			show_time_controls()
 		GameManager.GameState.REVIEW:
 			part_menu.visible = false
+			hide_time_controls()
+
+# Time control UI elements (created dynamically)
+var time_control_panel: HBoxContainer = null
+var pause_button: Button = null
+var speed_label: Label = null
+
+func show_time_controls() -> void:
+	if not time_control_panel:
+		create_time_controls()
+	time_control_panel.visible = true
+
+func hide_time_controls() -> void:
+	if time_control_panel:
+		time_control_panel.visible = false
+
+func create_time_controls() -> void:
+	# Create time control panel
+	time_control_panel = HBoxContainer.new()
+	time_control_panel.name = "TimeControlPanel"
+	add_child(time_control_panel)
+
+	# Position at bottom center
+	time_control_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	time_control_panel.position = Vector2(0, -80)
+	time_control_panel.custom_minimum_size = Vector2(400, 60)
+
+	# Add panel background
+	var panel_style = PanelContainer.new()
+	time_control_panel.add_child(panel_style)
+
+	var hbox = HBoxContainer.new()
+	panel_style.add_child(hbox)
+
+	# Speed buttons
+	var speeds = [
+		{"text": "0.25x", "value": 0.25},
+		{"text": "0.5x", "value": 0.5},
+		{"text": "▶ 1x", "value": 1.0},
+		{"text": "2x", "value": 2.0},
+		{"text": "4x", "value": 4.0}
+	]
+
+	for speed_data in speeds:
+		var btn = Button.new()
+		btn.text = speed_data.text
+		btn.custom_minimum_size = Vector2(70, 50)
+		btn.pressed.connect(_on_speed_button_pressed.bind(speed_data.value))
+		hbox.add_child(btn)
+
+	# Pause button
+	pause_button = Button.new()
+	pause_button.text = "|| Pause"
+	pause_button.custom_minimum_size = Vector2(90, 50)
+	pause_button.pressed.connect(_on_pause_button_pressed)
+	hbox.add_child(pause_button)
+
+	# Speed label
+	speed_label = Label.new()
+	speed_label.text = "Speed: 1.0x"
+	speed_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	speed_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hbox.add_child(speed_label)
+
+	time_control_panel.visible = false
+
+func _on_speed_button_pressed(speed: float) -> void:
+	Engine.time_scale = speed
+	if speed_label:
+		speed_label.text = "Speed: %.2fx" % speed
+	# Unpause if paused
+	get_tree().paused = false
+	if pause_button:
+		pause_button.text = "|| Pause"
+
+func _on_pause_button_pressed() -> void:
+	get_tree().paused = not get_tree().paused
+	if pause_button:
+		if get_tree().paused:
+			pause_button.text = "▶ Resume"
+		else:
+			pause_button.text = "|| Pause"
 
 func _on_level_completed(cost: int, time: float, size: int) -> void:
 	show_review(cost, time, size)

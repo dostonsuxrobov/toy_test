@@ -29,6 +29,8 @@ window/stretch/mode="canvas_items"
 3d/default_gravity=9.8
 3d/default_linear_damp=0.1
 3d/default_angular_damp=0.1
+common/physics_ticks_per_second=60
+common/physics_jitter_fix=0.0
 
 [rendering]
 

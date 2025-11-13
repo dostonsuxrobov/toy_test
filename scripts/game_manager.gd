@@ -2,8 +2,8 @@ extends Node
 class_name GameManager
 
 # Game states
-enum GameState { BUILD, TEST, REVIEW }
-var current_state: GameState = GameState.BUILD
+enum GameState { BRIEFING, BUILD, TEST, REVIEW }
+var current_state: GameState = GameState.BRIEFING
 
 # Current level/contract data
 var current_level: Dictionary = {}
@@ -38,6 +38,10 @@ func reset_workspace() -> void:
 	placed_parts.clear()
 	total_cost = 0
 	completion_time = 0.0
+	change_state(GameState.BRIEFING)
+
+func start_building() -> void:
+	# Transition from BRIEFING to BUILD mode
 	change_state(GameState.BUILD)
 
 func change_state(new_state: GameState) -> void:
@@ -48,17 +52,28 @@ func change_state(new_state: GameState) -> void:
 	state_changed.emit(new_state)
 
 	match new_state:
+		GameState.BRIEFING:
+			# Lock camera and building - establishing shot
+			enable_physics(false)
+			reset_time_scale()
 		GameState.BUILD:
 			# Enable building mode
 			enable_physics(false)
+			reset_time_scale()
 		GameState.TEST:
 			# Start physics simulation
 			enable_physics(true)
+			reset_time_scale()
 			start_time = Time.get_ticks_msec() / 1000.0
 		GameState.REVIEW:
 			# Calculate completion time
 			completion_time = (Time.get_ticks_msec() / 1000.0) - start_time
 			show_review()
+			reset_time_scale()
+
+func reset_time_scale() -> void:
+	Engine.time_scale = 1.0
+	get_tree().paused = false
 
 func enable_physics(enabled: bool) -> void:
 	# Toggle physics on all placed parts
