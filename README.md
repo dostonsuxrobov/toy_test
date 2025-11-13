@@ -1,167 +1,130 @@
-# Dorfromantik Clone
+# Tiny Glade Clone
 
-A mechanically perfect recreation of Dorfromantik built in Godot 4.5.
-
-## About
-
-This is a faithful recreation of the peaceful puzzle game Dorfromantik, featuring hexagonal tile placement, scoring mechanics, quest system, and beautiful 3D visuals.
+A technical clone of the cozy castle-building game **Tiny Glade**, built with Godot 4.5.
 
 ## Features
 
-### Core Mechanics
-- **Hexagonal Grid System**: Using axial coordinates for accurate hex tile placement
-- **Tile Placement**: Place tiles adjacent to existing tiles with proper validation
-- **Terrain Matching**: Tiles must match adjacent terrains (fields, forests, villages, water, railways)
-- **Tile Rotation**: Rotate tiles before placement (Q/E keys or on-screen controls)
-- **50 Tiles per Game**: Standard game length with turn tracking
-
-### Scoring System
-- **Area-Based Scoring**: Points awarded based on connected area sizes
-- **Perfect Placement Bonus**: +50 points when all 6 sides of a tile match neighbors
-- **Quest Completion**: Bonus points for completing quests (e.g., "Create an area of 10 forest tiles")
-- **Progressive Scoring**: Larger areas grant more points per tile
-
-### Visual Features
-- **3D Hexagonal Tiles**: Procedurally generated with colored segments for each terrain type
-- **Five Terrain Types**:
-  - Fields (Yellow) - Farmland and crops
-  - Forests (Green) - Trees
-  - Villages (Red) - Houses and buildings
-  - Water (Blue) - Rivers and lakes
-  - Railways (Gray) - Train tracks
-- **Quest Markers**: Visual flags indicate tiles with quests
-- **Placement Preview**: Semi-transparent preview showing valid/invalid placements
-- **Beautiful Environment**: Sky, lighting, and atmosphere
-
-### Camera Controls
-- **Pan**: Middle mouse button drag or WASD/Arrow keys
-- **Zoom**: Mouse wheel
-- **Rotate**: Right mouse button drag
-
-### Quest System
-- Random quest tiles appear during gameplay (~15% chance)
-- Quests require completing connected areas of specific terrain types
-- Quest markers clearly show required terrain and target size
-- Bonus points awarded upon quest completion
+- **Gridless Building System**: Place walls, towers, and gates anywhere on the terrain
+- **Intuitive Camera Controls**: Orbit, pan, and zoom to view your creation from any angle
+- **Wall Chaining**: Click to place wall points and create connected wall segments
+- **Multiple Building Types**:
+  - Walls: Create connected wall segments
+  - Towers: Cylindrical towers with decorative roofs and flags
+  - Gates: Archways with pillars
+- **Procedural Details**: Buildings include windows, flags, and decorative elements
+- **Save/Load System**: Save your creations and load them later
+- **Path Painting**: Hold Shift and click to paint paths on the ground
 
 ## Controls
 
-| Action | Input |
-|--------|-------|
-| Place Tile | Left Mouse Click |
-| Rotate Tile Left | Q |
-| Rotate Tile Right | E |
-| Pan Camera | Middle Mouse Drag / WASD / Arrow Keys |
-| Zoom Camera | Mouse Wheel |
-| Rotate Camera | Right Mouse Drag |
+### Camera
+- **Right Mouse Button + Drag**: Rotate camera around the scene
+- **Middle Mouse Button + Drag**: Pan camera
+- **Mouse Wheel**: Zoom in/out
 
-## How to Play
+### Building
+- **Left Click**: Place building piece at cursor location
+- **1 Key**: Switch to Wall mode
+- **2 Key**: Switch to Tower mode
+- **3 Key**: Switch to Gate mode
+- **X Key**: Switch to Delete mode
+- **ESC Key**: Clear current wall chain
+- **Shift + Left Click**: Paint path on ground
 
-1. **Start the Game**: Launch the project in Godot 4.5 or export and run
-2. **View Current Tile**: The next tile to place is shown as a preview
-3. **Position the Tile**: Move your mouse over the grid to preview placement
-4. **Rotate if Needed**: Use Q/E to rotate the tile before placing
-5. **Place the Tile**: Click to place when the preview shows valid (white tint)
-6. **Score Points**: Match terrain types to create large connected areas
-7. **Complete Quests**: Fulfill quest requirements for bonus points
-8. **Play Until End**: Continue until all 50 tiles are placed
+### UI Buttons
+- **Wall/Tower/Gate/Delete Buttons**: Switch between building modes
+- **Clear Chain**: End the current wall chain
+- **Save**: Save your creation to disk
+- **Load**: Load a previously saved creation
 
-## Technical Implementation
+## Building Guide
 
-### Architecture
-- **Autoload Singletons**: GameManager and ScoringSystem for global state
-- **Hexagonal Coordinate System**: Axial coordinates with cube coordinate support
-- **Tile Data Structure**: Each tile has 6 sides + center terrain
-- **Procedural Mesh Generation**: Dynamic 3D tile meshes with vertex colors
-- **Signal-Based Communication**: Event-driven architecture for loose coupling
+### Walls
+1. Click the "Wall" button or press `1`
+2. Click on the terrain to place the first wall point
+3. Click again to create a wall segment to the new point
+4. Continue clicking to chain wall segments together
+5. Press `ESC` or click "Clear Chain" to start a new wall chain
 
-### Key Systems
+### Towers
+1. Click the "Tower" button or press `2`
+2. Click anywhere on the terrain to place a tower
+3. Towers include decorative roofs and flags
 
-#### HexGrid (scripts/hex_grid/)
-- `hex_coord.gd`: Hexagonal coordinate math and conversions
-- `hex_grid.gd`: Grid management, tile storage, and validation
+### Gates
+1. Click the "Gate" button or press `3`
+2. Click on the terrain to place a gate archway
+3. Gates consist of two pillars and a top arch
 
-#### Tiles (scripts/tiles/)
-- `terrain_type.gd`: Terrain type enum and color definitions
-- `tile_data.gd`: Tile data structure with rotation support
-- `tile_generator.gd`: Procedural tile generation with multiple patterns
-- `hex_tile_3d.gd`: 3D visual representation of tiles
+### Deleting
+1. Click the "Delete" button or press `X`
+2. Click on any building piece to remove it
 
-#### Autoload (scripts/autoload/)
-- `game_manager.gd`: Game flow, turn management, tile generation
-- `scoring_system.gd`: Score calculation, quest tracking
+### Paths
+1. Hold `Shift` and click to paint brown path tiles on the ground
+2. Create pathways between your buildings
 
-#### Camera (scripts/camera/)
-- `camera_controller.gd`: Full camera control system
+## Technical Details
 
-#### Scenes
-- `main.tscn`: Main game scene with grid, camera, and UI
-- `ui.tscn`: HUD displaying score, tiles remaining, and controls
-
-### Algorithms
-
-#### Tile Generation
-- Multiple pattern types: single terrain, two-terrain split, three-terrain, complex
-- Weighted random generation for natural distribution
-- Quest tile generation ensures quest terrain is present
-
-#### Area Calculation
-- Depth-first search to calculate connected area sizes
-- Used for scoring and quest completion checking
-- Efficient visited tracking prevents duplicate counting
-
-#### Placement Validation
-- Checks all adjacent tiles for terrain matching
-- First tile can be placed anywhere
-- Subsequent tiles must have at least one neighbor and all sides must match
-
-## Project Structure
-
+### Project Structure
 ```
-dorfromantik-clone/
-├── project.godot
-├── icon.svg
-├── README.md
+toy_test/
+├── project.godot          # Godot project configuration
 ├── scenes/
-│   ├── main.tscn
-│   └── ui.tscn
-└── scripts/
-    ├── game_scene.gd
-    ├── autoload/
-    │   ├── game_manager.gd
-    │   └── scoring_system.gd
-    ├── camera/
-    │   └── camera_controller.gd
-    ├── hex_grid/
-    │   ├── hex_coord.gd
-    │   └── hex_grid.gd
-    └── tiles/
-        ├── terrain_type.gd
-        ├── tile_data.gd
-        ├── tile_generator.gd
-        └── hex_tile_3d.gd
+│   └── main.tscn         # Main game scene
+├── scripts/
+│   ├── main.gd           # Main scene controller
+│   ├── camera_controller.gd      # Camera movement and controls
+│   ├── building_manager.gd       # Building placement logic
+│   ├── building_piece.gd         # Building piece base class
+│   ├── building_decorator.gd     # Procedural decoration system
+│   ├── path_painter.gd           # Path painting system
+│   ├── ui_manager.gd             # UI and button handling
+│   └── game_manager.gd           # Game state and save/load
+└── assets/
+    ├── models/           # 3D models (procedurally generated)
+    ├── textures/         # Textures
+    └── materials/        # Materials
 ```
 
-## Requirements
+### System Requirements
+- Godot Engine 4.3+ (compatible with 4.5)
+- OpenGL 3.3 compatible graphics card
 
-- Godot Engine 4.3 or higher (tested with 4.5)
-- OpenGL 3.3 / Vulkan compatible graphics
+## How to Run
+
+1. Install [Godot Engine 4.3+](https://godotengine.org/download)
+2. Open Godot and click "Import"
+3. Navigate to this project folder and select `project.godot`
+4. Click "Import & Edit"
+5. Press `F5` or click the "Play" button to run the game
+
+## Save Files
+
+Save files are stored in the user data directory:
+- **Linux**: `~/.local/share/godot/app_userdata/Tiny Glade Clone/`
+- **Windows**: `%APPDATA%\Godot\app_userdata\Tiny Glade Clone\`
+- **macOS**: `~/Library/Application Support/Godot/app_userdata/Tiny Glade Clone/`
 
 ## Future Enhancements
 
-Possible additions for even more accuracy:
-- Biome-specific tiles (mountains, plains, etc.)
-- Animated water and environment effects
-- Sound effects and music
-- Save/load game state
-- High score tracking
-- Procedural decoration objects (trees, houses, etc.)
-- Multiple game modes (endless, challenge, etc.)
-
-## License
-
-Created as an educational recreation of Dorfromantik mechanics. Original game by Toukana Interactive.
+Potential features to add:
+- Terrain sculpting and elevation changes
+- More building types (houses, bridges, stairs)
+- Dynamic ivy and vegetation growth
+- Ambient animals (sheep, birds)
+- Weather effects and time of day
+- Procedural texture variations
+- Undo/Redo system
+- Multiple save slots
+- Screenshot/export functionality
 
 ## Credits
 
-Built with Godot Engine 4.5 using GDScript.
+Inspired by [Tiny Glade](https://store.steampowered.com/app/2198150/Tiny_Glade/) by Pounce Light.
+
+Built with [Godot Engine](https://godotengine.org/).
+
+## License
+
+This project is a technical demonstration and educational clone. All rights to the original Tiny Glade game belong to Pounce Light.
