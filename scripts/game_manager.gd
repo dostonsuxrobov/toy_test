@@ -3,7 +3,7 @@ class_name GameManager
 
 # Game states
 enum GameState { BRIEFING, BUILD, TEST, REVIEW }
-var current_state: GameState = GameState.BRIEFING
+var current_state: GameState = GameState.BUILD  # Start in BUILD mode
 
 # Current level/contract data
 var current_level: Dictionary = {}
@@ -38,7 +38,7 @@ func reset_workspace() -> void:
 	placed_parts.clear()
 	total_cost = 0
 	completion_time = 0.0
-	change_state(GameState.BRIEFING)
+	change_state(GameState.BUILD)  # Start in BUILD mode
 
 func start_building() -> void:
 	# Transition from BRIEFING to BUILD mode

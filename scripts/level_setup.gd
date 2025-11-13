@@ -5,7 +5,7 @@ extends Node
 @onready var game_manager: GameManager = get_node("/root/Main/GameManager")
 
 func _ready() -> void:
-	await get_tree().process_frame
+	# Wait one frame for nodes to be ready
 	await get_tree().process_frame
 	setup_first_level()
 
@@ -17,7 +17,8 @@ func setup_first_level() -> void:
 	var ball = workspace.create_ball_part()
 	ball.position = Vector3(-8, 3, 0)
 	workspace.add_child(ball)
-	# Don't add to game manager parts list (it's free/provided)
+	# Add to game manager so it gets unfrozen during TEST mode
+	game_manager.placed_parts.append(ball)
 
 	# Place the goal button on the right side
 	var button = workspace.create_button_part()
