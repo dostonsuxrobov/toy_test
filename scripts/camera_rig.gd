@@ -102,7 +102,7 @@ func update_camera_position() -> void:
 	) * current_distance
 
 	camera.position = offset
-	camera.look_at(Vector3.ZERO, Vector3.UP)
+	camera.look_at(position, Vector3.UP)
 
 func snap_to_last_placed(part: Node3D) -> void:
 	# Snap focal point to the last placed object
